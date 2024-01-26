@@ -37,7 +37,7 @@ namespace COIS3020_Assignment1_TmDC_20240204
 
         // 2 marks
         // Return the index of the server with the given name; otherwise return -1
-        private int FindServer(string name)
+       private int FindServer(string name)
         {
             int i; //variable declaring
             for (i = 0; i <NumServers; i++) {
@@ -47,9 +47,11 @@ namespace COIS3020_Assignment1_TmDC_20240204
             }
             return -1;
         }
+        
         // 3 marks
         // Double the capacity of the server graph with the respect to web servers
         private void DoubleCapacity()
+       /*
         {
             //@bug-2
             //variables as new capacity & resize of array:
@@ -66,6 +68,8 @@ namespace COIS3020_Assignment1_TmDC_20240204
             }
             E = nEMatrix;
         }
+        */
+            
         // 3 marks
         // Add a server with the given name and connect it to the other server
         // Return true if successful; otherwise return false
@@ -90,6 +94,7 @@ namespace COIS3020_Assignment1_TmDC_20240204
             NumServers++; //An increase
             return true;
         }
+/*
         // 3 marks
         // Add a webpage to the server with the given name
         // Return true if successful; other return false
@@ -104,6 +109,48 @@ namespace COIS3020_Assignment1_TmDC_20240204
             }
             return false;
         }
+*/
+        // 3 marks Pirakash
+// Add a webpage to the server with the given name
+// Return true if successful; other return false
+public bool AddServer(string name, string other)
+{
+    //server with given name already exists
+    if (FindServer(name) == -1)
+    {
+        //check if the server with the given name already exists
+        return false;
+    }
+     // check if number of servers has reached the capacity and double the capacity if needed 
+    if (NumServers >= V.Length)
+    {
+        DoubleCapacity;
+    }
+
+    //Create new server with given name
+    WebServer newServer = new WebServer(name);
+    V[NumServers] = newServer;
+
+    //Find other server
+    int indexOther = FindServer(other);
+
+    //Check if other server exists
+    if (indexOther != -1)
+    {
+        //Connect the new server to the other server in both directions 
+        E[NumServers, indexOther] = true;
+
+        E[indexOther, NumServer] = true;
+    }
+    
+    //Increment the number of servers
+    Numservers++;
+
+    //add to the server
+    return true;
+
+}      
+/*
         // 4 marks
         // Remove the server with the given name by assigning its connections
         // and webpages to the other server
@@ -153,6 +200,59 @@ namespace COIS3020_Assignment1_TmDC_20240204
             //setting indecies
             //
         }
+    */
+        // 4 marks Pirakash
+// Remove the server with the given name by assigning its connections
+// and webpages to the other server
+// Return true if successful; otherwise return false
+public bool RemoveServer(string name, string other)
+{
+    // Find the index of the server to be removed
+    int i = FindServer(name);
+
+    // Find the index of the server to which connections and webpages will be assigned
+    int j = FindServer(other);
+
+    // Check if both servers exist
+    if (i > -1 && j > -1)
+    {
+        // Transfer connections from the server to be removed to the other server
+        for (int h = 0; h < NumServers; h++)
+        {
+            if (E[indexToRemove, h])
+            {
+                E[i, h] = false;
+                E[j, h] = true;
+            }
+        }
+
+        // Transfer webpages from the server to be removed to the other server
+        for(WebPage webpage in V[i].P)
+        {
+            V[j].P.Add(webpage);
+        }
+
+        // Swap the server to be removed with the last vertex (include V and E)
+        for (int k = 0; k < NumServers; k++)
+        {
+            E[i, k] = E[NumServers - 1, k];
+            E[k, i] = E[k, NumServers - 1];
+            E[NumServers - 1, k] = false;
+            E[k, NumServers - 1] = false;  
+        }
+
+        // Update the array of servers, reducing the number of servers
+        V[indexToRemove] = V[NumServers - 1];
+        NumServers--;
+
+        // Successfully removed the server
+        return true;
+    }
+
+    // One of the servers doesn't exist
+    return false;
+}   
+    /*
         // 3 marks
         // Add a connection from one server to another
         // Return true if successful; otherwise return false
@@ -172,6 +272,29 @@ namespace COIS3020_Assignment1_TmDC_20240204
             }
             return false;
         }
+*/
+        // 3 marks Pirakash
+        // Add a connection from one server to another
+        // Return true if successful; otherwise return false
+        // Note that each server is connected to at least one other server
+        public bool AddConnection(string from, string to)
+        {
+            // Find the indices of the 'from' and 'to' servers
+            int i, j;
+            if ((i = FindServer(from)) > -1 && (j = FindServer(to)) > -1)
+            {
+                // Check if the connection doesn't already exist
+                if (E[i, j] == false)
+            {
+                // Establish the connection from 'from' to 'to'
+                E[i, j] = true;
+                return true; // Connection added successfully
+            }    
+        }
+
+         // Connection already exists or one of the servers doesn't exist
+         return false;
+}
         // 10 marks
         // Return all servers that would disconnect the server graph into
         // two or more disjoint graphs if ever one of them would go down
